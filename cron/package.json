@@ -11,6 +11,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "date-and-time": "^2.4.1"
+    "date-and-time": "^2.4.1",
+    "mysql": "^2.18.1",
+    "node-7z": "^3.0.0"
   }
 }
