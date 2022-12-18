@@ -54,7 +54,7 @@ file.on("finish", function () {
 
         //each value in json['skrotyPodatnikowCzynnych'] map to array
         const czynni = json["skrotyPodatnikowCzynnych"].map((value) => {
-          return [value];
+          return ["czynny", value];
         });
 
         // split json['skrotyPodatnikowCzynnych'] into chunks of 100
@@ -66,40 +66,53 @@ file.on("finish", function () {
 
         console.log("File splitted into chunks");
 
-        console.log(chunks[0]);
+        //create connection to database
+        // const connection = mysql.createConnection({
+        //   host: "localhost",
+        //   user: "root",
+        //   password: "chello",
+        //   database: "test",
+        //   port: 666,
+        // });
 
-        //connect to database
-        const connection = mysql.createConnection({
+        //insert each chunk into database
+        // chunks.forEach((chunk) => {
+        //   connection.query(
+        //     "INSERT INTO `test`.`test` (`type`,`hash`) VALUES ?",
+        //     [chunk],
+        //     function (error, results, fields) {
+        //       if (error) throw error;
+        //       console.log("Chunk inserted into database");
+        //     }
+        //   );
+        // });
+
+        // //close connection
+        // connection.end();
+
+        //create pool connection to database
+        const pool = mysql.createPool({
+          connectionLimit: 50,
           host: "localhost",
           user: "root",
-          password: "",
-          database: "vatapi",
+          password: "chello",
+          database: "test",
+          port: 666,
         });
 
-        connection.connect(function (err) {
-          if (err) {
-            console.error("Error connecting: " + err.stack);
-            return;
+        //insert czynni into database
+        pool.query(
+          "INSERT INTO `test`.`test` (`type`,`hash`) VALUES ?",
+          [czynni],
+          function (error, results, fields) {
+            if (error) throw error;
+            console.log("Czynni inserted into database");
+            pool.end();
           }
+        );
 
-          console.log("Connected as id " + connection.threadId);
-        });
-
-        let type = "czynni";
-
-        //each chunk[0] value is an array of 100 values
-        chunks.forEach((chunk) => {
-          console.log("Inserting chunk");
-          console.log(chunk);
-        });
-
-        //close connection
-        connection.end(function (err) {
-          if (err) {
-            return console.log("error:" + err.message);
-          }
-          console.log("Close the database connection.");
-        });
+        // //close connection
+        // pool.end();
       }
     });
   });
